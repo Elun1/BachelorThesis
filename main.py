@@ -46,5 +46,10 @@ def create_log_folders():
         if not os.path.isfile(folder):
             os.system('mkdir {folder}'.format(folder=folder))
 
+def create_archive(src, archive):
+    #creates archive.
+    tar_cmd = 'tar -cvf {archive}.tar.gz {file}'
+    os.system(tar_cmd.format(archive=archive, file=src))
+
 if __name__ == '__main__':
     main()
