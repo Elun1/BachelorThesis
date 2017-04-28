@@ -2,5 +2,8 @@
 
 Python scripts to run jobs from the SpecCPU2006 suite.
 
-Caveats
+Caveats:
+
 Don't try to run multiple instances of calculix or tonto.
+
+See documentation for function descriptions
