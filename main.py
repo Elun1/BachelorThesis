@@ -38,12 +38,12 @@ def create_log_folders():
     subfolders = ['Runs2_2/', 'Runs2_4/', 'Runs2_6/', 'Runs2_12/', 'AllCombinations', 'SingleThread']
 
     #Create root and subfolders if they don't exist
-    if not os.path.isfile(root_folder):
+    if not os.path.isdir(root_folder):
         os.system('mkdir {folder}'.format(folder=root_folder))
 
     for subfolder in subfolders:
         folder = root_folder + subfolder
-        if not os.path.isfile(folder):
+        if not os.path.isdir(folder):
             os.system('mkdir {folder}'.format(folder=folder))
 
 def create_archive(src, archive):
