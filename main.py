@@ -13,7 +13,7 @@ def main():
     '458.sjeng.sh', '459.GemsFDTD.sh', '462.libquantum.sh', '464.h264ref.sh', '465.tonto.sh'
     '470.lbm.sh', '471.omnetpp.sh', '473.astar.sh', '481.wrf.sh', '482.sphinx3.sh', '483.xalancbmk.sh']
 
-    test_jobs = ['400.jobA.sh', '401.jobB.sh']
+    test_jobs = ['400.jobA.sh', '401.jobB.sh', '402.jobC.sh', '403.jobD.sh']
 
     remotehost = '10.0.0.1'
     create_log_folders()
