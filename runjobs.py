@@ -77,7 +77,7 @@ def all_combinations(jobs, remotehost=None):
                     if os.path.isfile(donefile):
                         finishedlist.append(donefile)
                     if len(finishedlist) >= totaljobs:
-                        finished = True:
+                        finished = True
 
         for donefile in finishedlist:
             os.system('rm {done}'.format(done=donefile))
@@ -200,7 +200,7 @@ def check_done(donejobs, totaljobs):
     finishedlist = []
     finished = False
 
-    while finished = False:
+    while not finished:
         time.sleep(2)
         for donefile in donejobs:
             if os.path.isfile(donefile):
@@ -213,20 +213,20 @@ def check_done(donejobs, totaljobs):
                 os.system('rm {done}'.format(done=donefile))
                 start_job_wo_time(thread, job, donefile)
                 if len(finishedlist) >= totaljobs:
-                    finished = True:
+                    finished = True
 
     print('Done running dummies\nWaiting for existing dummies to finish.')
 
     finishedlist = []
     finished = False
 
-    while finished = False:
+    while not finished:
         time.sleep(2)
         for donefile in donejobs:
             if os.path.isfile(donefile) and donefile not in finishedlist:
                 finishedlist.append(donefile)
             if len(finishedlist) >= totaljobs:
-                finished = True:
+                finished = True
 
     print('All dummies are done\nCleaning up...\n')
     os.system('rm done*')
