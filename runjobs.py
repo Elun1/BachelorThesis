@@ -42,6 +42,7 @@ def single_thread(jobs, remotehost=None):
         logfile = logdir + 'singlethread.log'.format(job=job)
         donefile = 'done.{job}.{thread}'.format(job=job, thread=thread)
 
+        print("Running {job} on Thread: {thread}".format(job=job, thread=thread))
         taskset = '(/usr/bin/time -f \"Thread {thread}: {job}: %e\" -a -o {log} taskset -c {thread} ./{job};touch {donefile}) &'
         os.system(taskset.format(thread=thread, job=job, log=logfile, donefile=donefile))
 
@@ -71,6 +72,7 @@ def all_combinations(jobs, remotehost=None):
         if comb[0] != comb[1]:
             check_done(donejobs, totaljobs)
         else:
+            print("Pair detected. Not running dummies\n")
             while not finished:
                 time.sleep(5)
                 for donefile in donejobs:
