@@ -1,5 +1,196 @@
 Table of Contents
 
 1. main.py
+  1.1 def main
+  1.2 def create_log_folders()
 2. runjobs.py
+  2.1 def start_job(thread, job, log, donejobs)
+  2.2 def start_job_wo_time(thread, job, done)
+  2.3 def sync()
+  2.4 def scp_log(logdir, logfile, host)
+  2.5 def single_thread(jobs, remotehost=None)
+  2.6 def all_combinations(jobs, remotehost=None)
+  2.7 def all_pairs(jobs, totaljobs, remotehost=None)
+  2.8 def no_pairs(jobs, totaljobs, remotehost=None)
+  2.9 def check_logs(jobs, totaljobs)
+  2.10 def check_done(donejobs, totaljobs)
 3. sort.py
+
+
+
+1. main.py
+
+Main script of the project, imports runjobs.py and sortlogs.py
+
+1.1 def main()
+
+input: void
+return: void
+
+Description:
+
+Runs all functions from runjobs.py and sortlogs.py
+
+1.2 def create_log_folders()
+
+input: void
+return: void
+
+Description:
+Sets up folders for logfiles if they don't exist.
+
+
+2. runjobs.py
+
+Contains all functions to run jobs, scp to remote host
+
+2.1 def start_job(thread, job, log, donejobs)
+
+input:
+  thread(int): thread to run job on
+  job(str): job to run
+  log(str): logfile for /usr/bin/time to append to
+  donejobs(list): list to keep track of donefiles to look for in check_done()
+
+return:
+  donejobs(list): list to keep track of donefiles to look for in check_done()
+  
+description:
+starts jobs with /usr/bin/time to log job execution time and taskset -c X to run the job on a specific thread.
+When the job is done it creates a file, i.e 'done.400.jobA.sh.4', where 400.jobA.sh is the job name and 4 is the thread it ran the job on.
+The function returns a list of all done files to keep track of to run check_done().
+
+2.2 def start_job_wo_time(thread, job, done)
+
+input:
+  thread(int): thread to run job on
+  job(str): job to run
+  done(str): donefile to create when job is finished running (as create by start_job())
+  
+return: void
+
+description:
+This function does exactly the same thing as start_job() except it doesn't log the time. This function is typically only called by
+check_done() to run dummy jobs acting as co-scheduling pressure.
+
+2.3 def sync()
+
+input: void
+return: void
+
+description:
+Does an os.system("sync") call to write to disk, see https://ss64.com/bash/sync.html, and sleeps for 30 sec.
+
+2.4 def scp_log(logdir, logfile, host)
+
+input:
+  logdir(str): Source directory for logfile
+  logfile(str): logfile itself
+  host(str): remote host to scp the logfile to
+
+return: void
+
+description:
+uses scp in bash to transfer logfile to a remote host.
+
+NOTE:
+setup ssh keys and create an identical folder tree on remote host.
+
+2.5 def single_thread(jobs, remotehost=None)
+
+input:
+  jobs(list): list of jobs to run
+  remotehost(str): remote host to scp logfiles to
+  
+return: void
+
+description:
+Runs one job at a time. Doesn't call start_job() as it doesn't need the list of donefiles. Also doesn't call check_done()
+as there's no need for dummies. Contains both of those functions on a smaller scale.
+
+2.6 def all_combinations(jobs, remotehost=None)
+
+input:
+  jobs(list): list of jobs to run
+  remotehost(str): remote host to scp logfiles to
+  
+return: void
+
+description:
+Runs all combinations of given jobs on 2 threads sharing the same core using combinations_with_replacements() from itertools 
+(see https://docs.python.org/3/library/itertools.html#itertools.combinations_with_replacement).
+(thread 0 and 12 in this case, if you want to try this with SMT see thread_siblings_list in the intel_pstate driver for correct thread numbering).
+
+2.7 def all_pairs(jobs, totaljobs, remotehost=None)
+
+input:
+  jobs(list): list of jobs to run
+  totaljobs(int): total number of jobs to run 
+  remotehost(str): remote host to scp logfiles to
+  
+return: void
+
+description:
+Checks how many unique jobs it receives (jobs_unique) and how many to run of each job (jobs_instances). I.e if you give it 2 unique jobs and
+8 total jobs it runs 4 copies (instances) of each job. The function co-schedules all pairs, as in two instances of the same job
+shares a processing core.
+
+NOTE:
+if jobs_instances % 2 != 0 this function gives an assertion error.
+
+2.7 def no_pairs(job, totaljobs, remotehost=None)
+
+input:
+  jobs(list): list of jobs to run
+  totaljobs(int): total number of jobs to run 
+  remotehost(str): remote host to scp logfiles to
+  
+return: void
+
+description:
+Does exactly the same thing as all_pairs() except it co-schedules jobs to disallow pairs (two instances of the same job shouldn't run
+on the same processing core)
+
+NOTE:
+if the jobs_instances % 2 != 0 this function gives an assertion error.
+
+2.8 def no_ht(jobs, totaljobs, remotehost=None)
+
+input:
+  jobs(list): list of jobs to run
+  totaljobs(int): total number of jobs to run 
+  remotehost(str): remote host to scp logfiles to
+  
+return: void
+
+description:
+as long as totaljobs <= 12 (total physical CPU cores of your system) this function runs given jobs without Hyperthreading, as in
+1 job per core.
+
+2.9 def check_logs(jobs, totaljobs)
+
+input:
+  jobs(list): list of jobs to check for existing logfiles
+  totaljobs(int): total jobs (used to find correct logdir)
+  
+return:
+  logexist(int)
+  
+description:
+checks if a logfile exists. used to make sure we don't do redundant runs (doesn't check for _noHT logfiles).
+
+NOTE:
+this function is really bad.
+
+2.10 def check_done(donejobs, totaljobs)
+
+input:
+  donejobs(list): done files to look for
+  totaljobs(int): total amount of done files to look for
+
+return: void
+
+description:
+Looks for donefiles from the list donejobs (see def start_job()). When it finds a donefile it splits it to find the job and the thread
+it ran on and adds the donefile name to a list. If the list < totaljobs we have to run dummies (run the same job again to act as co-scheduling pressure)
+with the start_job_wo_time() function. When we don't have to run dummies anymore we wait for existing dummies to finish before we start new runs.
