@@ -39,7 +39,7 @@ def single_thread(jobs, remotehost=None):
     logdir = './logs/SingleThread/'
 
     for job in jobs:
-        logfile = logdir + 'ST_{job}.log'.format(job=job)
+        logfile = logdir + 'singlethread.log'.format(job=job)
         donefile = 'done.{job}.{thread}'.format(job=job, thread=thread)
 
         taskset = '(/usr/bin/time -f \"Thread {thread}: {job}: %e\" -a -o {log} taskset -c {thread} ./{job};touch {donefile}) &'
