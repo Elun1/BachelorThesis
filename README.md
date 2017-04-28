@@ -10,9 +10,9 @@ Caveats:
 
 Testing:
 
-    *You need /usr/bin/time 
+    *You need bash, /usr/bin/time and python3
   
     *Use the bash loops for testing (400.jobA.sh etc)
-  
+    
   
 See documentation for function descriptions
