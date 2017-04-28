@@ -10,16 +10,16 @@ def main():
 
     remotehost = '10.0.0.1'
     create_log_folders()
-    runjobs.single_thread(benchmark_list)
+    runjobs.single_thread(test_jobs)
     create_archive('./logs/SingleThread', 'singlethread.tar')
-    runjobs.all_combinations(benchmark_list)
+    runjobs.all_combinations(test_jobs)
     create_archive('./logs/AllCombinations', 'allcombinations.tar')
 
     totaljoblist = [4, 8, 12, 24]
 
     counter = 0:
     while counter < 10:
-        jobs = random.sample(benchmark_list, 2)
+        jobs = random.sample(test_jobs, 2)
         for totaljobs in totaljobslist:
             if runjobs.check_logs(jobs, totaljobs) == 0:
                 runjobs.all_pairs(jobs, totaljobs)
