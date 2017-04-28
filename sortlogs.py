@@ -59,9 +59,9 @@ def convert_logs_to_csv(path, remove=None):
         log_file = file
         csv_file = log_file.replace('.log', '.csv')
         with open(log_file, 'r') as input_file, open(csv_file, 'w') as output_file:
-            in_txt = csv.reader(input_file, delimiter = ' ')
+            in_log = csv.reader(input_file, delimiter = ' ')
             out_csv = csv.writer(output_file)
-            out_csv.writerows(in_txt)
+            out_csv.writerows(in_log)
     if remove:
         for file in os.listdir(path):
             if file.endswith('.log'):
