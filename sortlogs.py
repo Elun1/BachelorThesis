@@ -131,6 +131,3 @@ def calc_stp(filename, st_times):
             stp += float(st_time) / float(smt_time)
     #print(stp)
     return stp
-
-if __name__ == "__main__":
-    calculate_stp2()
