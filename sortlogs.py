@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/usr/bin/env python3
 
 import os
 import csv
@@ -22,12 +22,12 @@ def sort_allcombinations(src_dir, dst_dir):
                     for line in lines:
                         output_line += line
                         output_line += " "
-     
+
                 #Columns in right order
                 output_line = output_line.split(" ")
                 output_line[1], output_line[2] = output_line[2], output_line[1]
                 output_line = " ".join(output_line)
-     
+
                 output_file.write(output_line)
                 output_file.write("\n")
 
@@ -37,13 +37,13 @@ def sort_allcombinations(src_dir, dst_dir):
         with open(os.path.join(dst_dir, 'ALL.log'), 'r') as input_file, open(os.path.join(dst_dir,'{}.log'.format(benchmark)), 'w') as output_file:
             lines = input_file.read().splitlines()
             output_data = []
- 
+
             for line in lines:
                 columns = line.split(' ')
                 if benchmark in line:
                     if benchmark in columns[0]:
                         output_data.append(" ".join(columns))
-           
+
                     else:
                         columns[0], columns[1] = columns[1], columns[0]
                         columns[2], columns[3] = columns[3], columns[2]
@@ -68,45 +68,69 @@ def convert_logs_to_csv(path, remove=None):
                 os.remove(file)
 
 def calculate_stp():
-
-    root_path = os.getcwd()
-    path = root_path + '/logs'
-
-    st_file = root_path + '/logs/SingleThread/singlethread.log'
+    path = os.getcwd() + '/logs/'
+    st_file = path + 'SingleThread/singlethread.log'
+    # Read singlethread.log into dict
+    st_times = {} 
+    with open(st_file, 'r') as f:
+        data = f.read().splitlines()
+    for line in data:
+        job_name, job_time = line.split(" ")[2:]
+        st_times[job_name] = job_time
+    # Read smt logs into dict
 
     for subdir in os.listdir(path):
-        if subdir.startswith('Runs'):
-            os.chdir(subdir)
-            for rawfile in os.listdir(os.getcwd()):
-                if file.endswith('NoPairs.log'):
-                    stp_file = rawfile.replace('NoPairs.log', 'stp.log')
-                    with open(rawfile, 'r') as smt_file, open(st_file, 'r') as st_file, open(stp_file, 'a') as out_file:
+        if subdir.startswith("Runs"):
+            stp_times = {} # {'462.libquantum.sh_470.lbm.sh': {'stp_pairs': 31231, 'stp_no_pairs': 32123, 'stp_diff': 21313}}
+            for file in os.listdir(path + subdir):
 
-                        lines = smt_file.read().splitlines()
-                        smt_times = dict()
-                        jobs = []
+                if file.endswith("_NoPairs.log"):
+                    file_key = file.rstrip("_NoPairs.log")
+                    if file_key not in stp_times:
+                        stp_times[file_key] = {}
+                    stp_times[file_key]["stp_no_pairs"] = calc_stp(path + subdir + '/' + file, st_times)
 
-                        for line in lines:
-                            column = line.split(' ')
-                            job = column[1]
-                            smt_time = column[2]
-                            if job not in jobs:
-                                jobs.append(job)
-                            smt_times.update({job:smt_time})
+                elif file.endswith("_AllPairs.log"):
+                    file_key = file.rstrip("_AllPairs.log")
+                    if file_key not in stp_times:
+                        stp_times[file_key] = {}
+                    stp_times[file_key]["stp_pairs"] = calc_stp(path + subdir + '/' + file, st_times)
 
-                        lines = st_file.read().splitlines()
-                        st_times = dict()
+                elif file.endswith("_NoHT.log"):
+                    file_key = file.rstrip("_NoHT.log")
+                    if file_key not in stp_times:
+                        stp_times[file_key] = {}
+                    stp_times[file_key]["stp_no_ht"] = calc_stp(path + subdir + '/' + file, st_times)
 
-                        for line in lines:
-                            column = line.split(' ')
-                            job = column[1]
-                            st_time = column[2]
-                            if job in jobs:
-                                st_times.update({job:st_time})
+            for file_key in stp_times:
+                stp_times[file_key]["stp_diff"] = stp_times[file_key]["stp_no_pairs"] - stp_times[file_key]["stp_pairs"]
+                with open(path + subdir + '/' + file_key + "_stp.log", 'w') as f:
+                    f.write("STP AllPairs: " + str(stp_times[file_key]["stp_pairs"]) + "\n")
+                    f.write("STP NoPairs: " + str(stp_times[file_key]["stp_no_pairs"]) + "\n")
+                    f.write("STP Diff: " + str(stp_times[file_key]["stp_diff"]))
+                    if "stp_no_ht" in stp_times[file_key]:
+                        f.write("\n" + "STP NO HT: " + str(stp_times[file_key]["stp_no_ht"]))
 
-                elif file.endswith('AllPairs.log'):
-                    stp_file = rawfile.replace('AllPairs.log', 'stp.log')
-                    with open(rawfile, 'r') as smt_file, open(st_file, 'r') as st_file, open(stp_file, 'a') as out_file:
-                elif file.endswith('NoHT.log'):
-                    stp_file = rawfile.replace('NoHT.log', 'stp.log')
-                    with open(rawfile, 'r') as smt_file, open(st_file, 'r') as st_file, open(stp_file, 'a') as out_file:
+
+def calc_stp(filename, st_times):
+    #print(filename)
+    smt_times = {}
+    with open(filename, 'r') as f:
+        data = f.read().splitlines()
+    for line in data:
+        job_name, job_time = line.split(" ")[2:]
+        if not job_name in smt_times:
+            smt_times[job_name] = []
+        smt_times[job_name].append(job_time)
+
+    stp = 0.0 # System throughput
+    for job_name, smt_job_times in smt_times.items():
+        st_time = st_times[job_name]
+        for smt_time in smt_job_times:
+            #print(st_time + " / " + smt_time + " = " + str(float(st_time) / float(smt_time)))
+            stp += float(st_time) / float(smt_time)
+    #print(stp)
+    return stp
+
+if __name__ == "__main__":
+    calculate_stp2()
