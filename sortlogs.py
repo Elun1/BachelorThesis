@@ -66,3 +66,14 @@ def convert_logs_to_csv(path, remove=None):
         for file in os.listdir(path):
             if file.endswith('.log'):
                 os.remove(file)
+
+def calculate_stp():
+
+    root_path = os.getcwd()
+    path = root_path + '/logs'
+
+    st_file = root_path + '/logs/SingleThread/singlethread.log'
+    
+    for subdir in os.listdir(path):
+        if subdir.startswith('Runs'):
+            os.chdir(subdir)
