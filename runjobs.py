@@ -95,7 +95,7 @@ def all_pairs(jobs, totaljobs, remotehost=None):
     assert jobs_unique % 2 == 0
 
     logdir = './logs/Runs{jobs}_{instances}'.format(jobs=jobs_unique, instances=jobs_instances)
-    logfile = logdir + '/{jobA}_{jobB}_AllPairs.log'.format(jobA=jobs[0], jobB=jobs[1])
+    logfile = logdir + '_'.join(jobs) + '_AllPairs.log'
 
     print('Running {jobs}_{instances} All Pairs'.format(jobs=jobs_unique, instances=jobs_instances))
 
@@ -122,7 +122,7 @@ def no_pairs(jobs, totaljobs, remotehost=None):
     assert jobs_unique % 2 == 0
 
     logdir = './logs/Runs{jobs}_{instances}'.format(jobs=jobs_unique, instances=jobs_instances)
-    logfile = logdir + '/{jobA}_{jobB}_NoPairs.log'.format(jobA=jobs[0], jobB=jobs[1])
+    logfile = logdir + '_'.join(jobs) + '_NoPairs.log'
 
     print('Running {jobs}_{instances} No Pairs'.format(jobs=jobs_unique, instances=jobs_instances))
     job_split1 = jobs[:jobs_unique//2]
@@ -153,7 +153,7 @@ def no_ht(jobs, totaljobs, remotehost=None):
     assert totaljobs <= 12
 
     logdir = './logs/Runs{jobs}_{instances}'.format(jobs=jobs_unique, instances=jobs_instances)
-    logfile = logdir + '/{jobA}_{jobB}_NoHT.log'.format(jobA=jobs[0], jobB=jobs[1])
+    logfile = logdir + '_'.join(jobs) + '_NoHT.log'
 
     print('Running {jobs}_{instances} without HT'.format(jobs=jobs_unique, instances=jobs_instances))
 
