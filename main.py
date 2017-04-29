@@ -48,7 +48,14 @@ def create_log_folders():
 
 def create_archive(src, archive):
     #creates archive.
-    tar_cmd = 'tar -cvf {archive}.tar.gz {file}'
+    tar_cmd = 'tar -cf {archive}.tar.gz {file}'
+
+    fcounter = 1
+    if os.path.isfile(archive + '.tar.gz'):
+        while os.path.isfile(archive + str(fcounter) + '.tar.gz'):
+            fcounter += 1
+
+    archive += str(fcounter)
     os.system(tar_cmd.format(archive=archive, file=src))
 
 if __name__ == '__main__':
