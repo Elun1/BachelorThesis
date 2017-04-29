@@ -81,6 +81,29 @@ def calculate_stp():
                 if file.endswith('NoPairs.log'):
                     stp_file = rawfile.replace('NoPairs.log', 'stp.log')
                     with open(rawfile, 'r') as smt_file, open(st_file, 'r') as st_file, open(stp_file, 'a') as out_file:
+
+                        lines = smt_file.read().splitlines()
+                        smt_times = dict()
+                        jobs = []
+
+                        for line in lines:
+                            column = line.split(' ')
+                            job = column[1]
+                            smt_time = column[2]
+                            if job not in jobs:
+                                jobs.append(job)
+                            smt_times.update({job:smt_time})
+
+                        lines = st_file.read().splitlines()
+                        st_times = dict()
+
+                        for line in lines:
+                            column = line.split(' ')
+                            job = column[1]
+                            st_time = column[2]
+                            if job in jobs:
+                                st_times.update({job:st_time})
+
                 elif file.endswith('AllPairs.log'):
                     stp_file = rawfile.replace('AllPairs.log', 'stp.log')
                     with open(rawfile, 'r') as smt_file, open(st_file, 'r') as st_file, open(stp_file, 'a') as out_file:
