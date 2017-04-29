@@ -73,7 +73,17 @@ def calculate_stp():
     path = root_path + '/logs'
 
     st_file = root_path + '/logs/SingleThread/singlethread.log'
-    
+
     for subdir in os.listdir(path):
         if subdir.startswith('Runs'):
             os.chdir(subdir)
+            for rawfile in os.listdir(os.getcwd()):
+                if file.endswith('NoPairs.log'):
+                    stp_file = rawfile.replace('NoPairs.log', 'stp.log')
+                    with open(rawfile, 'r') as smt_file, open(st_file, 'r') as st_file, open(stp_file, 'a') as out_file:
+                elif file.endswith('AllPairs.log'):
+                    stp_file = rawfile.replace('AllPairs.log', 'stp.log')
+                    with open(rawfile, 'r') as smt_file, open(st_file, 'r') as st_file, open(stp_file, 'a') as out_file:
+                elif file.endswith('NoHT.log'):
+                    stp_file = rawfile.replace('NoHT.log', 'stp.log')
+                    with open(rawfile, 'r') as smt_file, open(st_file, 'r') as st_file, open(stp_file, 'a') as out_file:
