@@ -1,3 +1,5 @@
+#!/bin/python3
+
 import os
 import time
 import itertools
@@ -20,17 +22,16 @@ def start_job_wo_time(thread, job, done):
     os.system(taskset.format(thread=thread, job=job, done=done))
     print('Running dummy for {job} on Thread: {thread}'.format(job=job, thread=thread)) 
 
-
 def sync():
 
     os.system("sync")
     time.sleep(30)
 
-def scp_log(logdir, logfile, host):
+def scp_log(logdir, logfile, remotehost):
 
     remote_dir = logdir.replace('./', '')
     scp_cmd = 'scp {log} {remotehost}:{remotedir}'
-    os.system(scp_cmd.format(log=log, remotehost=remotehost, logdir=logdir))
+    os.system(scp_cmd.format(log=log, remotehost=remotehost, remotedir=remotedir))
 
 def single_thread(jobs, remotehost=None):
 
@@ -59,18 +60,22 @@ def all_combinations(jobs, remotehost=None):
     thread1 = 0
     thread2 = 12
     totaljobs = 2
-    logdir = './logs/AllCombinations'
-    donejobs = []
+    logdir = './logs/AllCombinations/'
 
     for comb in itertools.combinations_with_replacement(jobs, 2):
-        logfile = logdir + '/{jobA}_{jobB}.log'.format(jobA=comb[0], jobB=comb[1])
+
+    	donejobs = []
+        logfile = logdir + '{jobA}_{jobB}.log'.format(jobA=comb[0], jobB=comb[1])
+
         start_job(thread1, comb[0], logfile, donejobs)
         start_job(thread2, comb[1], logfile, donejobs)
 
         finishedlist = []
         finished = False
+
         if comb[0] != comb[1]:
             check_done(donejobs, totaljobs)
+            
         else:
             print("Pair detected. Not running dummies\n")
             while not finished:
