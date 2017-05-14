@@ -154,7 +154,6 @@ def no_pairs(jobs, totaljobs, remotehost=None):
 def no_ht(jobs, totaljobs, remotehost=None):
     jobs_unique = len(jobs)
     jobs_instances = totaljobs//jobs_unique
-    assert jobs_unique % 2 == 0
     assert totaljobs <= 12
 
     logdir = './logs/Runs{jobs}_{instances}'.format(jobs=jobs_unique, instances=jobs_instances)
@@ -199,7 +198,8 @@ def check_logs(jobs, totaljobs):
         logexist += 1
     if os.path.isfile(nopairs_log):
         logexist += 1
-
+        
+    jobs[0], jobs[1] = jobs[1], jobs[0]
     return logexist
 
 def check_done(donejobs, totaljobs):

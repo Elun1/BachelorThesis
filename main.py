@@ -36,7 +36,31 @@ def main():
     test_jobs = ['400.jobA.sh', '401.jobB.sh', '402.jobC.sh', '403.jobD.sh']
 
     remotehost = '10.0.0.1'
-    create_archive()
+    create_log_folders()
+
+    single_thread(benchmark_list, remotehost)
+    create_archive('./logs/SingleThread', 'singlethread.tar.gz')
+
+    all_combinations(benchmark_list, remotehost)
+    create_archive('./logs/AllCombinations', 'allcombinations.tar.gz')
+
+    total_jobs_increment = [4, 8, 12, 24]
+    c = 0
+    while c >= 20:
+        jobs = random.sample(benchmark_list, 2)
+        for totaljobs in total_jobs_increment:
+            if check_logs(jobs) == 0:
+                all_pairs(jobs, totaljobs, remotehost)
+                no_pairs(jobs, totaljobs, remotehost)
+                no_ht(jobs, totaljobs, remotehost)
+
+    for subdir in os.listdir('./logs/'):
+        if subdir.startswith('Runs'):
+            archive = 'subdir' + 'tar.gz'
+            src_file = './logs/' + subdir
+            create_archive(archive, src_file)
+
+    stp()
 
 def create_log_folders():
 
@@ -55,10 +79,10 @@ def create_log_folders():
 
 def create_archive(src, archive):
     #creates archive.
-    tar_cmd = 'tar -cf {archive}.tar.gz {file}'
+    tar_cmd = 'tar -cf {archive} {file}'
 
     fcounter = 1
-    if os.path.isfile(archive + '.tar.gz'):
+    if os.path.isfile(archive) or os.path.isdir(archive):
         while os.path.isfile(archive + str(fcounter) + '.tar.gz'):
             fcounter += 1
 
