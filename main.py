@@ -3,33 +3,40 @@
 import os
 import datetime
 import random
-import runjobs
-import sortlogs
+from runjobs import *
+'''
+start_job(thread, job, log, donejobs)
+start_job_wo_time(thread, job, done)
+sync() #Calls sync with os.system() and sleeps for 30 sec
+scp_log(logdir, logfile, remotehost)
+single_thread(jobs, remotehost=None)
+all_combinations(jobs, remotehost=None)
+all_pairs(jobs, totaljobs, remotehost=None)
+no_pairs(jobs, totaljobs, remotehost=None)
+no_ht(jobs, totaljobs, remotehost=None)
+check_logs(jobs, totaljobs)
+check_done(donejobs, totaljobs)
+'''
+from sortlogs import *
+'''
+sort_allcombinations(src_dir, dst_dir) #this isnt tested
+convert_logs_to_csv(path, remove=None)
+stp()
+calc_stp(filename, st_times) #
+'''
+from cpu_conf import *
+'''
+no_turbo(state) #this isnt tested, but should work
+scaling_freq(min_freq, max_freq) #this isnt tested
+'''
 
 def main():
 
+    benchmark_list = ['400.perlbench.sh', '401.bzip2.sh', '403.gcc.sh', '410.bwaves.sh', '429.mcf.sh', '433.milc.sh', '434.zeusmp.sh', '435.gromacs.sh', '436.cactusADM.sh', '437.leslie3d.sh', '444.namd.sh', '445.gobmk.sh', '447.dealII.sh', '450.soplex.sh', '453.povray.sh', '454.calculix.sh', '456.hmmer.sh', '458.sjeng.sh', '459.GemsFDTD.sh', '462.libquantum.sh', '464.h264ref.sh', '465.tonto.sh', '470.lbm.sh', '471.omnetpp.sh', '473.astar.sh', '481.wrf.sh', '482.sphinx3.sh', '483.xalancbmk.sh']
     test_jobs = ['400.jobA.sh', '401.jobB.sh', '402.jobC.sh', '403.jobD.sh']
 
     remotehost = '10.0.0.1'
-    create_log_folders()
-    runjobs.single_thread(test_jobs)
-    create_archive('./logs/SingleThread', 'singlethread.tar')
-    runjobs.all_combinations(test_jobs)
-    create_archive('./logs/AllCombinations', 'allcombinations.tar')
-
-    totaljoblist = [4, 8, 12, 24]
-
-    counter = 0:
-    while counter < 10:
-        jobs = random.sample(test_jobs, 2)
-        for totaljobs in totaljobslist:
-            if runjobs.check_logs(jobs, totaljobs) == 0:
-                runjobs.all_pairs(jobs, totaljobs)
-                runjobs.no_pairs(jobs, totaljobs)
-                if totaljobs == 12:
-                    runjobs.no_ht(jobs, totaljobs)
-            else:
-                print("Combination already run. Getting new job mix")
+    create_archive()
 
 def create_log_folders():
 
