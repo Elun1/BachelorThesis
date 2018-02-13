@@ -4,31 +4,9 @@ import os
 import datetime
 import random
 from runjobs import *
-'''
-start_job(thread, job, log, donejobs)
-start_job_wo_time(thread, job, done)
-sync() #Calls sync with os.system() and sleeps for 30 sec
-scp_log(logdir, logfile, remotehost)
-single_thread(jobs, remotehost=None)
-all_combinations(jobs, remotehost=None)
-all_pairs(jobs, totaljobs, remotehost=None)
-no_pairs(jobs, totaljobs, remotehost=None)
-no_ht(jobs, totaljobs, remotehost=None)
-check_logs(jobs, totaljobs)
-check_done(donejobs, totaljobs)
-'''
 from sortlogs import *
-'''
-sort_allcombinations(src_dir, dst_dir) #this isnt tested
-convert_logs_to_csv(path, remove=None)
-stp()
-calc_stp(filename, st_times) #
-'''
 from cpu_conf import *
-'''
-no_turbo(state) #this isnt tested, but should work
-scaling_freq(min_freq, max_freq) #this isnt tested
-'''
+
 
 def main():
 
